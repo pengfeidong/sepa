@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email        = ["applicationagilab@engie.com"]
   s.description  = "This gem allows you to generate XML documents for SEPA Direct Debit (SDD)."
   s.summary      = "SEPA Direct Debit (SDD) XML Generator."
-  s.homepage     = "http://h1l1chp10p.dc.infra.com/agilab_gems/sepa"
+  s.homepage     = "http://ip-10-199-149-104.aws.dmpa.myengie.com/gitlab/agilab_gems/sepa"
   s.license      = "MIT"
 
   # Manifest
