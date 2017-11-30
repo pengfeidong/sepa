@@ -14,6 +14,7 @@ module Sepa
       @debtor_name                = ''
       @debtor_iban                = ''
       @remittance_information     = ''
+      @has_change_iban			  = false
     end
 
     def instruction_identification
@@ -128,6 +129,14 @@ module Sepa
       @remittance_information = ustrd
     end
 
+    def has_change_iban
+      @has_change_iban
+    end
+
+    def has_change_iban=(change_iban)
+      @has_change_iban = change_iban
+    end
+
     def to_xml(document)
       xml = Nokogiri::XML::Node.new "DrctDbtTxInf", document
 
@@ -153,6 +162,20 @@ module Sepa
       drct_dbt_tx_mndt_rltd_inf_mndt_id     = Nokogiri::XML::Node.new "MndtId", document
       drct_dbt_tx_mndt_rltd_inf_dt_of_sgntr = Nokogiri::XML::Node.new "DtOfSgntr", document
       drct_dbt_tx_mndt_rltd_inf_amdmnt_ind  = Nokogiri::XML::Node.new "AmdmntInd", document
+
+      if has_change_iban
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls = Nokogiri::XML::Node.new "AmdmntInfDtls", document
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct = Nokogiri::XML::Node.new "OrgnlDbtrAcct", document
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id = Nokogiri::XML::Node.new "Id", document
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id_othr = Nokogiri::XML::Node.new "Othr", document
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id_othr.content = "SMNDA"
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id << drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id_othr
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct << drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct_id
+        drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls << drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls_orgnl_dbtr_acct
+        drct_dbt_tx_mndt_rltd_inf << drct_dbt_tx_mndt_rltd_inf_amd_mnt_inf_dtls
+      end
+
+
       drct_dbt_tx_mndt_rltd_inf_mndt_id.content = mandate_identification
       drct_dbt_tx_mndt_rltd_inf_dt_of_sgntr.content = date_of_signature
       drct_dbt_tx_mndt_rltd_inf_amdmnt_ind.content = amendment_indicator
@@ -164,9 +187,18 @@ module Sepa
 
       dbtr_agt                  = Nokogiri::XML::Node.new "DbtrAgt", document
       dbtr_agt_fin_instn_id     = Nokogiri::XML::Node.new "FinInstnId", document
-      dbtr_agt_fin_instn_id_bic = Nokogiri::XML::Node.new "BIC", document
-      dbtr_agt_fin_instn_id_bic.content = debtor_agent_bic
-      dbtr_agt_fin_instn_id << dbtr_agt_fin_instn_id_bic
+      if debtor_agent_bic.blank?
+        dbtr_agt_fin_instn_id_oth = Nokogiri::XML::Node.new "Oth", document
+        dbtr_agt_fin_instn_id_oth_id = Nokogiri::XML::Node.new "Id", document
+        dbtr_agt_fin_instn_id_oth_id.content = "NOTPROVIDED"
+        dbtr_agt_fin_instn_id_oth << dbtr_agt_fin_instn_id_oth_id
+        dbtr_agt_fin_instn_id << dbtr_agt_fin_instn_id_oth
+      else
+        dbtr_agt_fin_instn_id_bic = Nokogiri::XML::Node.new "BIC", document
+        dbtr_agt_fin_instn_id_bic.content = debtor_agent_bic
+        dbtr_agt_fin_instn_id << dbtr_agt_fin_instn_id_bic
+      end
+
       dbtr_agt << dbtr_agt_fin_instn_id
       xml << dbtr_agt
 
