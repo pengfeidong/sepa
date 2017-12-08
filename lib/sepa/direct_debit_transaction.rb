@@ -188,7 +188,7 @@ module Sepa
       dbtr_agt                  = Nokogiri::XML::Node.new "DbtrAgt", document
       dbtr_agt_fin_instn_id     = Nokogiri::XML::Node.new "FinInstnId", document
       if debtor_agent_bic.blank?
-        dbtr_agt_fin_instn_id_oth = Nokogiri::XML::Node.new "Oth", document
+        dbtr_agt_fin_instn_id_oth = Nokogiri::XML::Node.new "Othr", document
         dbtr_agt_fin_instn_id_oth_id = Nokogiri::XML::Node.new "Id", document
         dbtr_agt_fin_instn_id_oth_id.content = "NOTPROVIDED"
         dbtr_agt_fin_instn_id_oth << dbtr_agt_fin_instn_id_oth_id
